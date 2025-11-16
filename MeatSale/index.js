@@ -477,6 +477,77 @@ class HFContract extends Contract {
       return {successful: false}
     }
   }
+
+  //DataTransfer -- type of event 
+  async trigger_temperatureAlert(ctx, args) {
+    const cid = new ClientIdentity(ctx.stub);
+    let roleObj;
+
+    const inputs = JSON.parse(args);
+  	const contractId = inputs.contractId;
+  	const event = inputs.event;
+    const contractState = await ctx.stub.getState(contractId)
+    if (contractState == null) {
+      return {successful: false}
+    }
+    const contract = deserialize(contractState.toString())
+          //notification 
+      const oldMessagesList = []
+      oldMessagesList.push(contract.notified.message.slice())
+      //
+    this.initialize(contract)
+    if (contract.isInEffect()  ){
+     
+    try{
+      //const userId = cid.getID();
+
+       roleObj = contract.authenticate(cid.getAttributeValue('HF.role'), cid.getAttributeValue('HF.name'), 
+       cid.getAttributeValue('organization'), cid.getAttributeValue('department'),contract)
+
+             if(roleObj === null ){ // this mean the roleObj (role who calls the transaction) exist in our conttract
+              throw new Error('Unauthorized: Unknown access'); 
+         //roleObj: we do not have a role that has the same name and type that calls the transaction like e.g., there is no shipper
+        // wrong certificate
+        }
+
+    }catch(err){
+        console.log('access control error: ', err)
+        return { successful: false, message: err.message }
+    }// end of first layer
+    //seond layer 
+  	
+        let controllers = contract.temperature._controller
+    	if(!contract.accessPolicy.hasPermesstion('grant','read', contract.temperature, roleObj, contract.temperature.getController(controllers.length - 1)) || 
+    	      !contract.accessPolicy.isValid(new Rule('grant','read', contract.temperature, roleObj, contract.temperature.getController(controllers.length - 1))) ){
+    	        throw new Error(`access denied...`)
+    	      }
+      contract.temperature.happen(event)
+      Events.emitEvent(contract, new InternalEvent(InternalEventSource.contractEvent, InternalEventType.contractEvent.Happened, contract.temperature))
+      
+      //for loop to check which role recive the notification for datatransfer (i.e., temperature) alert
+       let MSG= "sensorId: " + event.sensorId + ", value: " + event.value + ", sensorTimestamp: " + event.sensorTimestamp + ", " + contractId;
+       contract.notified.message.push({name: 'temperatureAlert', message: MSG, roles:contract.accessPolicy.permissionValid(contract.temperature,
+  contract._roles,contract.temperature.getController(controllers.length - 1), contract) , time: new Date().toISOString()})
+
+
+         //notification
+        for (const message of contract.notified.message) {
+        if (!oldMessagesList[0].includes(message)) {
+          this.trigger_notification(ctx, message)
+          console.log("I am in index insdie trigger delivered (2)")
+        }
+    }
+    //
+      //Notification: was there
+      //ctx.stub.setEvent('Notified: triggerPaid', Buffer.from(serialize(contract)));
+      await ctx.stub.putState(contractId, Buffer.from(serialize(contract)))
+      return {successful: true}
+       
+    } else {
+      return {successful: false}
+    }
+
+  }
   
   async trigger_paid(ctx, args) {
     const cid = new ClientIdentity(ctx.stub);
@@ -771,8 +842,39 @@ class HFContract extends Contract {
       	      !contract.accessPolicy.isValid(new Rule('grant','read', contract.obligations.delivery, contract.buyer, contract.buyer)) ){
       	        throw new Error(`access denied...`)
       	      }
+
+                 //notify
+            //notification 
+      const oldMessagesList = []
+      oldMessagesList.push(contract.notified.message.slice())
+      //
+      let transitionState = contract.obligations.delivery.state;
+      console.log("before violated")
+
+
       	if (contract.obligations.delivery.violated()) {      
         		await ctx.stub.putState(contractId, Buffer.from(serialize(contract)))
+
+             console.log("inside violated")
+
+                             //notify
+                          let MSG= contract.obligations.delivery.state + " Changed to " + contract.obligations.delivery.name + " " + contract.obligations.delivery.contract.id;
+                          contract.notified.message.push({name: 'Obligation_delivery', message: MSG+transitionState, roles:contract.accessPolicy.permissionValid(contract.obligations.delivery,[contract.obligations.delivery.creditor,contract.obligations.delivery.debtor],contract.obligations.delivery.getController(controllers.length - 1), contract) , time: new Date().toISOString()})
+
+
+                 //notification
+                  console.log("before for of notification")
+        for (const message of contract.notified.message) {
+        //if (!oldMessagesList[0].includes(message)) {
+          this.trigger_notification(ctx, message)
+          console.log("I am in index insdie violateObligation ")
+       // }
+    }
+    //
+
+
+
+
         		return {successful: true}
       	} else {
         		return {successful: false}
@@ -817,7 +919,7 @@ class HFContract extends Contract {
 
                              //notify
                           let MSG= contract.obligations.payment.state + " Changed to " + contract.obligations.payment.name + " " + contract.obligations.payment.contract.id;
-                          contract.notified.message.push({name: 'Obligation_payment', message: MSG+transitionState, roles:contract.accessPolicy.permissionValid(contract.obligations.payment,[contract.obligations.payment.creditor,contract.obligations.payment.debtor],contract.obligations.payment.getController(controllers.length - 1)) , time: new Date().toISOString()})
+                          contract.notified.message.push({name: 'Obligation_payment', message: MSG+transitionState, roles:contract.accessPolicy.permissionValid(contract.obligations.payment,[contract.obligations.payment.creditor,contract.obligations.payment.debtor],contract.obligations.payment.getController(controllers.length - 1), contract) , time: new Date().toISOString()})
 
 
                  //notification
@@ -837,7 +939,7 @@ class HFContract extends Contract {
                           console.log("MSG")
                           console.log(MSG)
                            let controllers = contract.obligations.payment._controller
-                          contract.notified.message.push({name: 'Obligation_payment', message: MSG+transitionState, roles:contract.accessPolicy.permissionValid(contract.obligations.payment,[contract.obligations.payment.creditor,contract.obligations.payment.debtor],contract.obligations.payment.getController(controllers.length - 1)) , time: new Date().toTimeString()})
+                          contract.notified.message.push({name: 'Obligation_payment', message: MSG+transitionState, roles:contract.accessPolicy.permissionValid(contract.obligations.payment,[contract.obligations.payment.creditor,contract.obligations.payment.debtor],contract.obligations.payment.getController(controllers.length - 1), contract) , time: new Date().toTimeString()})
 
 
                  //notification

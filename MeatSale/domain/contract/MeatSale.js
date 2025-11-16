@@ -2,6 +2,10 @@
   const { Meat } = require("../assets/Meat.js")
   const { Delivered } = require("../events/Delivered.js")
   const { Paid } = require("../events/Paid.js")
+  /******** AC */
+  const { Temperature } = require("../events/datatransfer/Temperature.js")
+
+  
   const { PaidLate } = require("../events/PaidLate.js")
   const { InspectedQuality } = require("../events/InspectedQuality.js")
   const { PasswordNotification } = require("../events/PasswordNotification.js")
@@ -152,6 +156,16 @@ this.paid.payDueDate._value = this.payDueDate
       this.paid.addPerformer(this.buyer)
        this.paid.addController(this.buyer)  
       		this.passwordNotification = new PasswordNotification("passwordNotification")
+
+//**AC */
+this.temperature = new Temperature("temperature")
+//varibles will come from outside only here add controller and performer
+this.temperature.addPerformer(this.regulator)
+this.temperature.addController(this.seller) 
+this.temperature.condition._value = "value <= 18"
+this.temperature.window._value = 10
+this.temperature.count._value = 1
+
       
       this.passwordNotification.addPerformer(this.transportCo)
        this.passwordNotification.addController(this.transportCo)  
@@ -171,6 +185,11 @@ this.addController(this.buyer);
           	  
           	  this.deliverySituation.addConsequentOf({_type: 'eventCondition', resource:"delivered", resourceType:"Delivered"} )
           	   this.deliverySituation.addConsequentOf({ leftSide:'this.delivered.deliveryAddress._value', op:'===', rightSide: 'this.buyer.warehouse._value', _type: 'Condition'})
+                 //*/
+                 this.deliverySituation.addConsequentOf({leftSide: 'this.temperature.value._value', op:'<=', rightSide:'-5', _type: 'Condition'}) // go to the parts (else)
+
+
+
         this.obligations.delivery = new Obligation('delivery', this.buyer, this.seller, this, this.deliverySituation)
           	    this.paymentSituation = new LegalSituation();
           	  

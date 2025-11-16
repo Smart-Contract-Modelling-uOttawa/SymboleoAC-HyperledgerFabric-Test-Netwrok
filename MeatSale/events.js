@@ -141,7 +141,7 @@ contract.inspectMeatSituation.addConsequentOf({_type: 'eventCondition', resource
                              //**code generation */
                           let controllers = contract.obligations.payment._controller
                           let MSG= contract.obligations.payment.state + " Changed to " + contract.obligations.payment.name + " " + contract.obligations.payment.contract.id;
-                          contract.notified.message.push({name: 'Obligation_payment', message: MSG+transitionState, roles:contract.accessPolicy.permissionValid(contract.obligations.payment,[contract.obligations.payment.creditor,contract.obligations.payment.debtor],contract.obligations.payment.getController(controllers.length - 1)) , time: new Date().toISOString()})
+                          contract.notified.message.push({name: 'Obligation_payment', message: MSG+transitionState, roles:contract.accessPolicy.permissionValid(contract.obligations.payment,[contract.obligations.payment.creditor,contract.obligations.payment.debtor],contract.obligations.payment.getController(controllers.length - 1), contract) , time: new Date().toISOString()})
 
 
                   }else{
@@ -159,8 +159,15 @@ contract.inspectMeatSituation.addConsequentOf({_type: 'eventCondition', resource
                   }
                 },
                 fulfillObligation_delivery(contract) {
-                  if (contract.obligations.delivery != null && (Predicates.weakHappensBefore(contract.delivered, contract.delivered.delDueDate._value)  && contract.delivered.deliveryAddress._value===contract.buyer.warehouse._value) ) { 
+                  if (contract.obligations.delivery != null && (Predicates.weakHappensBefore(contract.delivered, contract.delivered.delDueDate._value)  && contract.delivered.deliveryAddress._value===contract.buyer.warehouse._value && !Predicates.happens(contract.temperature))) { 
                     contract.obligations.delivery.fulfilled()
+                    //notify
+                      let transitionState = contract.obligations.delivery.state;
+                      ////notify 
+                             //**code generation */
+                          let controllers = contract.obligations.delivery._controller
+                          let MSG= contract.obligations.delivery.state + " Changed to " + contract.obligations.delivery.name + " " + contract.obligations.delivery.contract.id;
+                          contract.notified.message.push({name: 'Obligation_delivery', message: MSG+transitionState, roles:contract.accessPolicy.permissionValid(contract.obligations.delivery,[contract.obligations.delivery.creditor,contract.obligations.delivery.debtor],contract.obligations.delivery.getController(controllers.length - 1), contract) , time: new Date().toISOString()})
                   }
                 },
                 successfullyTerminateContract(contract) {
@@ -202,6 +209,8 @@ contract.inspectMeatSituation.addConsequentOf({_type: 'eventCondition', resource
                   [[new InternalEvent(InternalEventSource.contractEvent, InternalEventType.contractEvent.Happened, contract.paidLate), ], EventListeners.fulfillObligation_latePayment],
                   [[new InternalEvent(InternalEventSource.contractEvent, InternalEventType.contractEvent.Happened, contract.inspectedQuality), ], EventListeners.fulfillObligation_inspectMeat],
                   [[new InternalEvent(InternalEventSource.contractEvent, InternalEventType.contractEvent.Happened, contract.delivered), ], EventListeners.fulfillObligation_delivery],
+                  [[new InternalEvent(InternalEventSource.contractEvent, InternalEventType.contractEvent.Happened, contract.temperature), ], EventListeners.fulfillObligation_delivery],
+
                 ]
               }
               

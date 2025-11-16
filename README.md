@@ -148,6 +148,23 @@ $ ./network.sh deployCC -c mychannel -ccn meatsale -ccv 7.8 -ccs 67 -ccp MeatSal
 $ ./network.sh deployCC -c mychannel -ccn meatsale -ccv 7.9 -ccs 68 -ccp MeatSale -ccl javascript
 $ ./network.sh deployCC -c mychannel -ccn meatsale -ccv 8.0 -ccs 69 -ccp MeatSale -ccl javascript
 $ ./network.sh deployCC -c mychannel -ccn meatsale -ccv 8.1 -ccs 70 -ccp MeatSale -ccl javascript
+$ ./network.sh deployCC -c mychannel -ccn meatsale -ccv 8.2 -ccs 71 -ccp MeatSale -ccl javascript
+$ ./network.sh deployCC -c mychannel -ccn meatsale -ccv 8.3 -ccs 72 -ccp MeatSale -ccl javascript
+$ ./network.sh deployCC -c mychannel -ccn meatsale -ccv 8.4 -ccs 73 -ccp MeatSale -ccl javascript
+$ ./network.sh deployCC -c mychannel -ccn meatsale -ccv 8.5 -ccs 74 -ccp MeatSale -ccl javascript
+$ ./network.sh deployCC -c mychannel -ccn meatsale -ccv 8.6 -ccs 75 -ccp MeatSale -ccl javascript
+$ ./network.sh deployCC -c mychannel -ccn meatsale -ccv 8.7 -ccs 76 -ccp MeatSale -ccl javascript
+$ ./network.sh deployCC -c mychannel -ccn meatsale -ccv 8.8 -ccs 77 -ccp MeatSale -ccl javascript
+$ ./network.sh deployCC -c mychannel -ccn meatsale -ccv 8.9 -ccs 78 -ccp MeatSale -ccl javascript
+$ ./network.sh deployCC -c mychannel -ccn meatsale -ccv 9.0 -ccs 79 -ccp MeatSale -ccl javascript
+
+
+
+
+
+
+
+
 
 
 
