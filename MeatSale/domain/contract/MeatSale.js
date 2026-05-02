@@ -2,12 +2,9 @@
   const { Meat } = require("../assets/Meat.js")
   const { Delivered } = require("../events/Delivered.js")
   const { Paid } = require("../events/Paid.js")
-  /******** AC */
-  const { Temperature } = require("../events/datatransfer/Temperature.js")
-
-  
   const { PaidLate } = require("../events/PaidLate.js")
   const { InspectedQuality } = require("../events/InspectedQuality.js")
+  const { Alert } = require("../events/datatransfer/Alert.js")
   const { PasswordNotification } = require("../events/PasswordNotification.js")
   const { UnLoaded } = require("../events/UnLoaded.js")
   const { Seller } = require("../roles/Seller.js")
@@ -17,7 +14,6 @@
   const { Regulator } = require("../roles/Regulator.js")
   const { Storage } = require("../roles/Storage.js")
   const { Shipper } = require("../roles/Shipper.js")
-  //** */
   const { Admin } = require("../roles/Admin.js")
   const { Currency } = require("../types/Currency.js")
   const { MeatQuality } = require("../types/MeatQuality.js")
@@ -44,9 +40,7 @@
       this.regulatorP = regulatorP
       this.storageP = storageP
       this.shipperP = shipperP
-      //** */
       this.adminP = adminP
-
       this.barcodeP = barcodeP
       this.qnt = qnt
       this.qlt = qlt
@@ -61,37 +55,21 @@
       this.obligations = {};
       this.survivingObligations = {};
       this.powers = {};
-      
+      //notification 
+      this.notified = new Notified ('notified')
       // assign varaibles of the contract
-      console.log("before seller")
       		this.seller = new Seller("seller")
-       console.log("after seller")
-//notification 
-this.notified = new Notified ('notified')
-
       
 this.seller.name._value = this.sellerP.name
 this.seller.returnAddress._value = this.sellerP.returnAddress
-//** */
 this.seller.org._value = this.sellerP.org
 this.seller.dept._value = this.sellerP.dept
        this.seller.addController(this.seller)  
        	 this.addRole(this.seller)
-
-
-//** */
-this.admin = new Admin("admin")
-this.admin.name._value = this.adminP.name
-this.admin.org._value = this.adminP.org
-this.admin.dept._value = this.adminP.dept
-       this.seller.addController(this.admin)  
-       	 this.addRole(this.admin)
-
       		this.buyer = new Buyer("buyer")
-
+      
 this.buyer.name._value = this.buyerP.name
 this.buyer.warehouse._value = this.buyerP.warehouse
-//** */
 this.buyer.org._value = this.buyerP.org
 this.buyer.dept._value = this.buyerP.dept
        this.buyer.addController(this.buyer)  
@@ -99,32 +77,46 @@ this.buyer.dept._value = this.buyerP.dept
       		this.transportCo = new TransportCo("transportCo")
       
 this.transportCo.name._value = this.transportCoP.name
+this.transportCo.org._value = this.transportCoP.org
+this.transportCo.dept._value = this.transportCoP.dept
        this.transportCo.addController(this.transportCo)  
        	 this.addRole(this.transportCo)
       		this.assessor = new Assessor("assessor")
       
 this.assessor.name._value = this.assessorP.name
+this.assessor.org._value = this.assessorP.org
+this.assessor.dept._value = this.assessorP.dept
        this.assessor.addController(this.assessor)  
        	 this.addRole(this.assessor)
       		this.regulator = new Regulator("regulator")
       
 this.regulator.name._value = this.regulatorP.name
-       this.regulator.addController(this.regulator)  
-       	 this.addRole(this.regulator)
-//** */
 this.regulator.org._value = this.regulatorP.org
 this.regulator.dept._value = this.regulatorP.dept
-
+       this.regulator.addController(this.regulator)  
+       	 this.addRole(this.regulator)
       		this.storage = new Storage("storage")
       
+this.storage.name._value = this.storageP.name
 this.storage.address._value = this.storageP.address
+this.storage.org._value = this.storageP.org
+this.storage.dept._value = this.storageP.dept
        this.storage.addController(this.storage)  
        	 this.addRole(this.storage)
       		this.shipper = new Shipper("shipper")
       
 this.shipper.name._value = this.shipperP.name
+this.shipper.org._value = this.shipperP.org
+this.shipper.dept._value = this.shipperP.dept
        this.shipper.addController(this.shipper)  
        	 this.addRole(this.shipper)
+      		this.admin = new Admin("admin")
+      
+this.admin.name._value = this.adminP.name
+this.admin.org._value = this.adminP.org
+this.admin.dept._value = this.adminP.dept
+       this.admin.addController(this.admin)  
+       	 this.addRole(this.admin)
       		this.goods = new Meat("goods")
       
 this.goods.quantity._value = this.qnt
@@ -155,17 +147,21 @@ this.paid.to._value = this.seller
 this.paid.payDueDate._value = this.payDueDate
       this.paid.addPerformer(this.buyer)
        this.paid.addController(this.buyer)  
+      		this.temperature = new Alert("temperature")
+      
+this.temperature.condition._value = "value > 2"
+this.temperature.window._value = "10"
+this.temperature.count._value = "1"
+this.temperature.addController(this.seller)
+      this.temperature.addPerformer(this.regulator)
+      		this.humidity = new Alert("humidity")
+      
+this.humidity.condition._value = "value < 85 OR value > 90"
+this.humidity.window._value = "10"
+this.humidity.count._value = "1"
+this.humidity.addController(this.seller)
+      this.humidity.addPerformer(this.regulator)
       		this.passwordNotification = new PasswordNotification("passwordNotification")
-
-//**AC */
-this.temperature = new Temperature("temperature")
-//varibles will come from outside only here add controller and performer
-this.temperature.addPerformer(this.regulator)
-this.temperature.addController(this.seller) 
-this.temperature.condition._value = "value <= 18"
-this.temperature.window._value = 10
-this.temperature.count._value = 1
-
       
       this.passwordNotification.addPerformer(this.transportCo)
        this.passwordNotification.addController(this.transportCo)  
@@ -184,12 +180,11 @@ this.addController(this.buyer);
           	    this.deliverySituation = new LegalSituation();
           	  
           	  this.deliverySituation.addConsequentOf({_type: 'eventCondition', resource:"delivered", resourceType:"Delivered"} )
-          	   this.deliverySituation.addConsequentOf({ leftSide:'this.delivered.deliveryAddress._value', op:'===', rightSide: 'this.buyer.warehouse._value', _type: 'Condition'})
-                 //*/
-                 this.deliverySituation.addConsequentOf({leftSide: 'this.temperature.value._value', op:'<=', rightSide:'-5', _type: 'Condition'}) // go to the parts (else)
-
-
-
+          	   this.deliverySituation.addConsequentOf({ leftSide:'contract.delivered.deliveryAddress._value', op:'===', rightSide: 'contract.buyer.warehouse._value', _type: 'Condition'})
+          	   
+          	  this.deliverySituation.addConsequentOf({_type: 'eventCondition', resource:"temperature", resourceType:"Alert"} )
+          	   
+          	  this.deliverySituation.addConsequentOf({_type: 'eventCondition', resource:"humidity", resourceType:"Alert"} )
         this.obligations.delivery = new Obligation('delivery', this.buyer, this.seller, this, this.deliverySituation)
           	    this.paymentSituation = new LegalSituation();
           	  
@@ -206,7 +201,7 @@ this.accessPolicy.addRulee("grant", "read", this.inspectedQuality, this.transpor
 this.accessPolicy.addRulee("grant", "read", this.inspectedQuality, this.seller, this.assessor)
 this.accessPolicy.addRulee("grant", "write", this.inspectedQuality, this.assessor, this.seller)
 this.accessPolicy.addRulee("revoke", "read", this.goods.quality, this.buyer, this.seller)
-
+this.accessPolicy.addRulee("grant", "read", this.temperature.value, this.buyer, this.seller)
  	}
 }
   

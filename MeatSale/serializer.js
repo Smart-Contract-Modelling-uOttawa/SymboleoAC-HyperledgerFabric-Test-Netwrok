@@ -6,9 +6,8 @@
    const { Event } = require("symboleoac-js-core")
    const { Power } = require("symboleoac-js-core")
    const { ACPolicy } = require("symboleoac-js-core")
-   //AC**
    const { DataTransfer } = require("symboleoac-js-core")
-   
+     
    let contract = null
    
    function deserialize(data) {
@@ -80,7 +79,7 @@
                  		}
                                  
                }else{//return objects that does not have name 
-                 if(contract[object[key][eKey]] !=  undefined){
+                 if(contract[key] !=  undefined){
                                  contract[key][eKey] = object[key][eKey]
                                }
                }
@@ -89,7 +88,7 @@
            }
             
            }else{//string/numerical and so on 
-             if(contract[object[key][eKey]] !=  undefined){
+             if(contract[key] !=  undefined){
                            contract[key][eKey] = object[key][eKey]
                  }
              }
@@ -232,7 +231,7 @@
        }
        contract.powers.terminateContract = power
      }
-   const contractList=['seller','buyer','transportCo','assessor','regulator','storage','shipper','admin','goods','delivered','paidLate','paid','passwordNotification','inspectedQuality','unLoaded','accessPolicy','temperature'] //AC 
+   const contractList=['seller','buyer','transportCo','assessor','regulator','storage','shipper','admin','goods','delivered','paidLate','paid','temperature','humidity','passwordNotification','inspectedQuality','unLoaded','accessPolicy']  
    for (const key of contractList) {
                if(object[key] === 'undefined'){
                   continue
@@ -243,7 +242,7 @@
                      contract[key].addController(reviverList(valuet)) 
                 
                    }//for Event
-                   if((contract[key] instanceof Event) || (contract[key] instanceof DataTransfer)){
+                   if(contract[key] instanceof Event || (contract[key] instanceof DataTransfer)){
                      contract[key]._performer = []
                      for(const valuet of object[key]._performer) {
                      	contract[key].addPerformer(reviverList(valuet)) 
