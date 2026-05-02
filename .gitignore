@@ -10,8 +10,14 @@ organizations/fabric-ca/org1/*
 # organizations/fabric-ca/org2/*
 organizations/ordererOrganizations/*
 organizations/peerOrganizations/*
+organizations_older_copy2024
 system-genesis-block/*
 *.tar.gz
 log.txt
 MeatSale/node_modules/*
 MeatSale_old/node_modules/*
+VaccineProcurementC/node_modules/*
+VaccineProcurementSharedParty/node_modules/*
+MeatSaleSharedParty/node_modules/*
+
+
