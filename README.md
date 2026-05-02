@@ -34,7 +34,7 @@ $ NOTE: after completing all the steps restart your system
 
 ```
 
-## Running the network-sofana 
+## Running the network
 
 ```bash
 
@@ -42,7 +42,7 @@ $ export PATH=${PWD}/bin:$PATH
 $ export FABRIC_CFG_PATH=${PWD}/configtx
 $ export VERBOSE=false
 
-## bring up the network-sofana with fabric-ca
+## bring up the network with fabric-ca
 
 $ docker stop $(docker ps -aq)
 $ docker rm $(docker ps -aq)
@@ -74,14 +74,22 @@ $ ./network.sh createChannel -c mychannel
 ```bash
 $ ./network.sh createChannel -c mychannel
 
+### General Deployment Command
+
 $ ./network.sh deployCC -c mychannel -ccn <chaincode name > -ccv <chaincode_version > -ccs <seq no > -ccp <chaincode dir path > -ccl < lang > 
 
+### Example Deployments
+
+# Meat Sale
 $ ./network.sh deployCC -c mychannel -ccn meatsale -ccv 1.0 -ccs 1 -ccp MeatSale -ccl javascript 
 
+# Vaccine Procurement
 $ ./network.sh deployCC -c mychannel -ccn vaccineprocurementc -ccv 1.0 -ccs 1 -ccp VaccineProcurementC -ccl javascript
 
+# Vaccine Procurement (Shared Party)
 $ ./network.sh deployCC -c mychannel -ccn vaccineprocurementsharedparty -ccv 1.0 -ccs 1 -ccp VaccineProcurementSharedParty -ccl javascript
 
+# Meat Sale (Shared Party)
 $ ./network.sh deployCC -c mychannel -ccn meatsalesharedparty -ccv 1.0 -ccs 1 -ccp MeatSaleSharedParty -ccl javascript
 
 
