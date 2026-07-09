@@ -10,9 +10,15 @@
 # peer each, and a single node Raft ordering service. Users can also use this
 # script to create a channel deploy a chaincode on the channel
 #
-# prepending $PWD/../bin to PATH to ensure we are picking up the correct binaries
-# this may be commented out to resolve installed version of tools if desired
-export PATH=${PWD}/bin-macos:$PATH
+# prepending the bundled Fabric binaries to PATH so we pick up the correct
+# versions. The repo ships both bin/ (Linux) and bin-macos/ (macOS); pick by
+# OS so a Linux/WSL host does not try to run the Mach-O binaries (Test-Netwrok#1).
+# This may be commented out to resolve an installed version of the tools instead.
+if [ "$(uname -s)" = "Darwin" ]; then
+  export PATH=${PWD}/bin-macos:$PATH
+else
+  export PATH=${PWD}/bin:$PATH
+fi
 export FABRIC_CFG_PATH=${PWD}/configtx
 export VERBOSE=false
 

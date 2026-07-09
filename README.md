@@ -2,6 +2,30 @@
 
 **SymboleoAC HyperledgerFabric Test Network** is a Hyperledger Fabric-based test network used to deploy and run smart contracts generated from SymboleoAC specifications. It provides a controlled environment to test, execute, and validate contract behavior on a blockchain platform.
 
+## Platform notes (Linux / WSL)
+
+Two setup issues bite non-macOS hosts:
+
+- **Binaries (Test-Netwrok#1).** The repo ships both `bin/` (Linux) and
+  `bin-macos/` (macOS). `network.sh` now selects the right directory by OS
+  (`uname -s`), so Linux/WSL no longer picks the Mach-O binaries and fails with
+  *"Peer binary and configuration files not found.."*. (Previously the path was
+  hard-wired to `bin-macos`.)
+- **Node runtime (Test-Netwrok#2).** Fabric 2.2's node chaincode runtime
+  image, `hyperledger/fabric-nodeenv:2.2`, is Node 12, which cannot parse modern
+  JavaScript (e.g. `||=`) emitted by current chaincode dependencies; the
+  chaincode container then exits with `SyntaxError: Unexpected token '='` during
+  registration. Before deploying a `javascript`/`typescript` chaincode, run once
+  per host:
+
+  ```bash
+  scripts/fix-nodeenv.sh
+  ```
+
+  which retags a modern nodeenv (`:2.5`, Node 22) under the `:2.2` tag the peer
+  looks for (idempotent; a no-op if `:2.2` already runs Node 18+). `deployCC`
+  prints a reminder when it deploys a node chaincode.
+
 ## Installation
 
 ## install docker, docker-compose
