@@ -88,6 +88,14 @@ else
   exit 1
 fi
 
+# Test-Netwrok#2: the Fabric 2.2 node runtime (fabric-nodeenv:2.2) is Node 12 and
+# rejects modern chaincode JavaScript. If the chaincode container exits with a
+# SyntaxError during registration, run scripts/fix-nodeenv.sh to give the peer a
+# modern Node runtime.
+if [ "$CC_RUNTIME_LANGUAGE" = "node" ]; then
+  infoln "Deploying a node chaincode. Note: Fabric 2.2's runtime image is Node 12; if registration fails with a SyntaxError, run 'scripts/fix-nodeenv.sh' (Test-Netwrok#2)."
+fi
+
 INIT_REQUIRED="--init-required"
 # check if the init fcn should be called
 if [ "$CC_INIT_FCN" = "NA" ]; then
